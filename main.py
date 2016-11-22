@@ -184,12 +184,12 @@ def main():
 
     sample = Graph(samplefile)
 
-    subgraph, tmp = sample.neighbourhood(1, 2)
+    # subgraph, tmp = sample.neighbourhood(, 2)
+    #
+    # for node in subgraph:
+    #     print node, subgraph[node]
 
-    for node in subgraph:
-        print node, subgraph[node]
-
-    stat = sample.eval_stat(1, 2)
+    stat = sample.eval_stat(sample.graph.keys()[0], 2)
 
     print 'stat:'
     for ind in stat:
