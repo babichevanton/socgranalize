@@ -66,18 +66,18 @@ class Graph:
     def _create_stat_str(self):
         stat = {}
 
-        stat[1] = 0  # for (a->b)(a->c)
-        stat[2] = 0  # for (b->a)(c->a)
-        stat[3] = 0  # for (a->b)(b->c)
-        stat[4] = 0  # for (a->b)(a->c)(c->b)
-        stat[5] = 0  # for (a->b)(b->c)(c->a)
-        stat[6] = 0  # for (a<->b)(a->c)
-        stat[7] = 0  # for (a<->b)(c->a)(c->b)
-        stat[8] = 0  # for (a<->b)(a->c)(b->c)
-        stat[9] = 0  # for (a<->b)(b->c)(c->a)
-        stat[10] = 0  # for (a<->b)(a<->c)
-        stat[11] = 0 # for (a<->b)(a<->c)(b->c)
-        stat[12] = 0 # for (a<->b)(a<->c)(b<->c)
+        stat[1]  = {'val': 0, 'desc': '(a->b)(a->c)'}
+        stat[2]  = {'val': 0, 'desc': '(b->a)(c->a)'}
+        stat[3]  = {'val': 0, 'desc': '(a->b)(b->c)'}
+        stat[4]  = {'val': 0, 'desc': '(a->b)(a->c)(c->b)'}
+        stat[5]  = {'val': 0, 'desc': '(a->b)(b->c)(c->a)'}
+        stat[6]  = {'val': 0, 'desc': '(a<->b)(a->c)'}
+        stat[7]  = {'val': 0, 'desc': '(a<->b)(c->a)(c->b)'}
+        stat[8]  = {'val': 0, 'desc': '(a<->b)(a->c)(b->c)'}
+        stat[9]  = {'val': 0, 'desc': '(a<->b)(b->c)(c->a)'}
+        stat[10] = {'val': 0, 'desc': '(a<->b)(a<->c)'}
+        stat[11] = {'val': 0, 'desc': '(a<->b)(a<->c)(b->c)'}
+        stat[12] = {'val': 0, 'desc': '(a<->b)(a<->c)(b<->c)'}
 
         return stat
 
@@ -119,42 +119,42 @@ class Graph:
                 if node2 in neighb[node1] and node3 in neighb[node1] or \
                     node1 in neighb[node2] and node3 in neighb[node2] or \
                     node1 in neighb[node3] and node2 in neighb[node3]:
-                    stat[1] += 1
+                    stat[1]['val'] += 1
                 elif node1 in neighb[node2] and node1 in neighb[node3] or \
                     node2 in neighb[node1] and node2 in neighb[node3] or \
                     node3 in neighb[node1] and node3 in neighb[node2]:
-                    stat[2] += 1
+                    stat[2]['val'] += 1
                 else:
-                    stat[3] += 1
+                    stat[3]['val'] += 1
             else:
                 if node2 in neighb[node1] and node3 in neighb[node1] or \
                     node1 in neighb[node2] and node3 in neighb[node2] or \
                     node1 in neighb[node3] and node2 in neighb[node3]:
-                    stat[4] += 1
+                    stat[4]['val'] += 1
                 else:
-                    stat[5] += 1
+                    stat[5]['val'] += 1
         elif twodir_edges == 1:
             if simple_edges == 1:
-                stat[6] += 1
+                stat[6]['val'] += 1
             else:
                 # 7-9 types
                 if twodir_edge == (node1, node2) and node1 in neighb[node3] and node2 in neighb[node3] or \
                     twodir_edge == (node2, node3) and node2 in neighb[node1] and node3 in neighb[node1] or \
                     twodir_edge == (node1, node3) and node1 in neighb[node2] and node3 in neighb[node2]:
-                    stat[7] += 1
+                    stat[7]['val'] += 1
                 elif twodir_edge == (node1, node2) and node3 in neighb[node1] and node3 in neighb[node2] or \
                     twodir_edge == (node2, node3) and node1 in neighb[node2] and node1 in neighb[node3] or \
                     twodir_edge == (node1, node3) and node2 in neighb[node1] and node2 in neighb[node3]:
-                    stat[8] += 1
+                    stat[8]['val'] += 1
                 else:
-                    stat[9] += 1
+                    stat[9]['val'] += 1
         elif twodir_edges == 2:
             if simple_edges == 0:
-                stat[10] += 1
+                stat[10]['val'] += 1
             else:
-                stat[11] += 1
+                stat[11]['val'] += 1
         else:
-            stat[12] += 1
+            stat[12]['val'] += 1
 
     def eval_stat(self, node, dist):
         dir, undir = self.neighbourhood(node, dist)
@@ -197,7 +197,7 @@ def main():
 
     print 'stat:'
     for ind in stat:
-        print ind, stat[ind]
+        print stat[ind]['desc'], stat[ind]['val']
 
     return 0
 
