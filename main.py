@@ -1,4 +1,5 @@
 import json
+import sys
 import os.path
 from itertools import combinations
 
@@ -178,9 +179,12 @@ class Graph:
         return stat
 
 
-def main():
-    # samplefile = 'data/graphSample.json'
-    samplefile = 'data/tmpsample.json'
+def main():    
+    datadir = 'data/'
+    if not os.path.isfile(datadir + sys.argv[1]):
+        print 'No such file'
+        return 1.
+    samplefile = datadir + sys.argv[1]
 
     sample = Graph(samplefile)
 
