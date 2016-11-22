@@ -1,75 +1,72 @@
 import json
 import os.path
-from copy import deepcopy
 
 
-def sample_extract(file):
-    with open(file, 'rt') as input:
-        strings = input.readlines()
+class Graph:
+    def __init__(self, file):
+        self.graph = self._extract(file)
+        self.undir = self._make_undirected(self.graph)
 
-    # list of elems. Elem is dict with 'id' as node index and 'value' as list of neighbours
-    list_sample = map(lambda x: json.loads(x), strings)
+    def _extract(self, file):
+        with open(file, 'rt') as input:
+            strings = input.readlines()
 
-    print list_sample[0]
+        # list of elems. Elem is dict with 'id' as node index and 'value' as list of neighbours
+        list_graph = map(lambda x: json.loads(x), strings)
 
-    # convert to dict of nodes with node index as key and list of neighbours as value
-    sample = {}
-    for node in list_sample:
-        sample[node['id']] = node['value']
+        # print list_graph[0]
 
-    return sample
+        # convert to dict of nodes with node index as key and list of neighbours as value
+        graph = {}
+        for node in list_graph:
+            graph[node['id']] = node['value']
 
+        return graph
 
-def make_undirected(graph):
-    res = {}
-    for node in graph:
-        res[node] = set(graph[node])
+    def _make_undirected(self, graph):
+        res = {}
+        for node in graph:
+            res[node] = set(graph[node])
 
-    for node in graph:
-        for neighbour in graph[node]:
-            res[neighbour].add(node)
+        for node in graph:
+            for neighbour in graph[node]:
+                res[neighbour].add(node)
 
-    for node in res:
-        res[node] = sorted(list(res[node]))
+        for node in res:
+            res[node] = sorted(list(res[node]))
 
-    return res
+        return res
 
+    def _neighbour_nodes(self, node, dist):
+        nodes = set([node])
+        seen = set([])
+        neighbours = set([node])
+        for i in xrange(dist):
+            for node in nodes:
+                seen.add(node)
+                neighbours.update(set(self.undir[node]))
+            nodes = neighbours.difference(seen)
 
-def neighbour_nodes(graph, node, dist):
-    nodes = set([node])
-    seen = set([])
-    neighbours = set([node])
-    for i in xrange(dist):
+        return list(neighbours)
+
+    def neighbourhood(self, node, dist):
+        subgraph = {}
+
+        nodes = self._neighbour_nodes(node, dist)
+
         for node in nodes:
-            seen.add(node)
-            neighbours.update(set(graph[node]))
-        nodes = neighbours.difference(seen)
+            subgraph[node] = filter(lambda x: x in nodes, self.graph[node])
 
-    return list(neighbours)
-
-
-def neighbourhood(graph, nodes):
-    subgraph = {}
-
-    for node in nodes:
-        subgraph[node] = filter(lambda x: x in nodes, graph[node])
-
-    return subgraph
+        return subgraph
 
 
 def main():
     # samplefile = 'data/graphSample.json'
     samplefile = 'data/tmpsample.json'
 
-    sample = sample_extract(samplefile)
+    sample = Graph(samplefile)
 
-    undir_sample = make_undirected(sample)
-
-    nodes = sorted(neighbour_nodes(undir_sample, 1, 2))
-
-    print nodes
-
-    subgraph = neighbourhood(sample, nodes)
+    subgraph = sample.neighbourhood(1, 2)
 
     for node in subgraph:
         print node, subgraph[node]
