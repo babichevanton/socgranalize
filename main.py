@@ -1,11 +1,12 @@
 import json
 import sys
 import os.path
-from itertools import combinations
 
 
 class Graph:
     def __init__(self, file):
+        print 'Construct graph from sample file'
+
         with open(file, 'rt') as input:
             strings = input.readlines()
 
@@ -14,7 +15,10 @@ class Graph:
 
         # convert to dict of nodes with node index as key and dict of neighbours as value
         self.graph = {}
+        i = 0
         for node in list_graph:
+            i += 1
+            print '\r    line {0}/{1}  [{2}%]'.format(i, len(list_graph),  i * 100 / len(list_graph)),
             if node['id'] not in self.graph:
                 self.graph[node['id']] = {'to': [], 'from': []}
             for target in node['value']:
@@ -22,32 +26,46 @@ class Graph:
                     self.graph[target] = {'to': [], 'from': []}
                 self.graph[node['id']]['to'].append(target)
                 self.graph[target]['from'].append(node['id'])
+        print
+        print
 
     def _undir(self, graph, node):
         neighbours = list(set(graph[node]['to']) | set(graph[node]['from']))
         return neighbours
 
     def _neighbour_nodes(self, node, dist):
+        print '  Find nodes in neighbourhood:'
         nodes = {node}
         seen = set([])
         neighbours = {node}
         for i in xrange(dist):
+            j = 0
             for node in nodes:
+                j += 1
+                print '\r    step {0}/{1}: node {2}/{3}  [{4}%]'.format(i + 1, dist, j, len(nodes), j * 100 / len(nodes)),
                 seen.add(node)
                 neighbours |= set(self._undir(self.graph, node))
             nodes = neighbours - seen
+        print
 
         return list(neighbours)
 
     def neighbourhood(self, node, dist):
+        print 'Evaluate {1}-neighbourhood of node "{0}".'.format(node, dist)
         neighbourhood = {}
 
         nodes = self._neighbour_nodes(node, dist)
 
+        print '  Filter edges in neighbourhood:'
+        i = 0
         for node in nodes:
+            i += 1
+            print '\r    node {0}/{1}  [{2}%]'.format(i, len(nodes), i * 100 / len(nodes)),
             neighbourhood[node] = {}
             neighbourhood[node]['to'] = filter(lambda x: x in nodes, self.graph[node]['to'])
             neighbourhood[node]['from'] = filter(lambda x: x in nodes, self.graph[node]['from'])
+        print
+        print
 
         return neighbourhood
 
@@ -153,9 +171,13 @@ class Graph:
     def eval_stat(self, node, dist):
         subgraph = self.neighbourhood(node, dist)
 
+        print 'Compute 3-graphlets occurance.'
         stat = self._create_stat_str()
 
+        i = 0
         for node1 in subgraph:
+            i += 1
+            print '\r    node {0}/{1}  [{2}%]'.format(i, len(subgraph), i * 100 / len(subgraph)),
             seen = set([])
             for node2 in self._undir(subgraph, node1):
                 # hold edge (node1,node2)
@@ -174,13 +196,15 @@ class Graph:
                     subgraph[node2]['from'].remove(node1)
                 # mark node2 as 'seen' to prevent repeated analize of graphlets with node1 and node2
                 seen.add(node2)
+        print
+        print
 
         return stat
 
 
-def main():    
+def main(file):
     datadir = 'data/'
-    if not os.path.isfile(datadir + sys.argv[1]):
+    if not os.path.isfile(datadir + file):
         print 'No such file'
         return 1.
     samplefile = datadir + sys.argv[1]
@@ -194,12 +218,13 @@ def main():
 
     stat = sample.eval_stat(sample.graph.keys()[0], 2)
 
-    print 'stat:'
+    print 'Computed 3-graphlets occurance statistics:'
     for ind in stat:
-        print stat[ind]['desc'], stat[ind]['val']
+        print '  {0}: {1}'.format(stat[ind]['desc'], stat[ind]['val'])
 
     return 0
 
 
 if __name__ == "__main__":
-    main()
+    file = sys.argv[1]
+    main(file)
