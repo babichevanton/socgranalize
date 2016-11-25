@@ -1,11 +1,13 @@
 import json
 import sys
 import os.path
+from time import time
 
 
 class Graph:
     def __init__(self, file):
         print 'Construct graph from sample file'
+        begin_time = time()
 
         with open(file, 'rt') as input:
             strings = input.readlines()
@@ -27,6 +29,8 @@ class Graph:
                 self.graph[node['id']]['to'].append(target)
                 self.graph[target]['from'].append(node['id'])
         print
+        cur_time = time()
+        print 'process took {0} sec'.format(cur_time - begin_time)
         print
 
     def _undir(self, graph, node):
@@ -35,6 +39,8 @@ class Graph:
 
     def _neighbour_nodes(self, node, dist):
         print '  Find nodes in neighbourhood:'
+        begin_time = time()
+
         nodes = {node}
         seen = set([])
         neighbours = {node}
@@ -47,24 +53,32 @@ class Graph:
                 neighbours |= set(self._undir(self.graph, node))
             nodes = neighbours - seen
         print
+        cur_time = time()
+        print '    process took {0} sec'.format(cur_time - begin_time)
 
         return list(neighbours)
 
     def neighbourhood(self, node, dist):
         print 'Evaluate {1}-neighbourhood of node "{0}".'.format(node, dist)
+        begin_time = time()
+
         neighbourhood = {}
 
         nodes = self._neighbour_nodes(node, dist)
-
         print '  Filter edges in neighbourhood:'
+        begin_tmp_time = time()
+
         i = 0
         for node in nodes:
             i += 1
             print '\r    node {0}/{1}  [{2}%]'.format(i, len(nodes), i * 100 / len(nodes)),
-            neighbourhood[node] = {}
+            neighbourhood[node] = {'to': [], 'from': []}
             neighbourhood[node]['to'] = filter(lambda x: x in nodes, self.graph[node]['to'])
             neighbourhood[node]['from'] = filter(lambda x: x in nodes, self.graph[node]['from'])
         print
+        cur_time = time()
+        print '    process took {0} sec'.format(cur_time - begin_tmp_time)
+        print 'process took {0} sec'.format(cur_time - begin_time)
         print
 
         return neighbourhood
@@ -172,6 +186,7 @@ class Graph:
         subgraph = self.neighbourhood(node, dist)
 
         print 'Compute 3-graphlets occurance.'
+        begin_time = time()
         stat = self._create_stat_str()
 
         i = 0
@@ -197,6 +212,8 @@ class Graph:
                 # mark node2 as 'seen' to prevent repeated analize of graphlets with node1 and node2
                 seen.add(node2)
         print
+        cur_time = time()
+        print '    process took {0} sec'.format(cur_time - begin_time)
         print
 
         return stat
