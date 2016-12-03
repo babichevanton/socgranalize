@@ -228,11 +228,6 @@ def main(file):
 
     sample = Graph(samplefile)
 
-    # subgraph, tmp = sample.neighbourhood(, 2)
-    #
-    # for node in subgraph:
-    #     print node, subgraph[node]
-
     stat = sample.eval_stat(sample.graph.keys()[0], 2)
 
     print 'Computed 3-graphlets occurance statistics:'
