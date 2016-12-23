@@ -96,8 +96,8 @@ class Graph:
         stat[12] = {'val': 0, 'desc': '(a<->b)(a<->c)(b->c)'}
         stat[13] = {'val': 0, 'desc': '(a<->b)(a<->c)(b<->c)'}
 
-        for type in stat:
-            stat[type]['lock'] = threading.Lock()
+        # for type in stat:
+        #     stat[type]['lock'] = threading.Lock()
 
         return stat
 
@@ -269,7 +269,7 @@ class Graph:
 
             for type in self.graph[node]['stat']:
                 self.graph[node]['stat'][type]['val'] /= 3
-                del self.graph[node]['stat'][type]['lock']
+                # del self.graph[node]['stat'][type]['lock']
 
             graph_elems.append({'id': node, 'stat': self.graph[node]['stat']})
         print
