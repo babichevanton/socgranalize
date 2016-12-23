@@ -10,10 +10,10 @@ class Graph:
         begin_time = time()
 
         with open(file, 'rt') as input:
-            strings = input.readlines()
+            list_graph = input.readlines()
 
         # list of elems. Elem is dict with 'id' as node index and 'value' as list of neighbours
-        list_graph = map(lambda x: json.loads(x), strings)
+        list_graph = map(lambda x: json.loads(x), list_graph)
 
         # convert to dict of nodes with node index as key and dict of neighbours as value
         self.graph = {}
