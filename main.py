@@ -318,6 +318,6 @@ def main(infile, outfile, dist, thread_num):
 if __name__ == "__main__":
     infile = sys.argv[1]
     outfile = sys.argv[2]
-    dist = sys.argv[3]
+    dist = int(sys.argv[3])
     thread_num = int(sys.argv[4])
     main(infile, outfile, dist, thread_num)
