@@ -6,21 +6,21 @@ from time import time
 
 class Graph:
     def __init__(self, file):
-        print 'Construct graph from sample file'
+        print('Construct graph from sample file')
         begin_time = time()
 
         with open(file, 'rt') as input:
             list_graph = input.readlines()
 
         # list of elems. Elem is dict with 'id' as node index and 'value' as list of neighbours
-        list_graph = map(lambda x: json.loads(x), list_graph)
+        list_graph = [json.loads(x) for x in list_graph]
 
         # convert to dict of nodes with node index as key and dict of neighbours as value
         self.graph = {}
         i = 0
         for node in list_graph:
             i += 1
-            print '\r    line {0}/{1}  [{2}%]'.format(i, len(list_graph),  i * 100 / len(list_graph)),
+            print('\r    line {0}/{1}  [{2}%]'.format(i, len(list_graph), i * 100 // len(list_graph)), end=' ')
             if node['id'] not in self.graph:
                 self._create_node(node['id'])
             for target in node['value']:
@@ -28,13 +28,13 @@ class Graph:
                     self._create_node(target)
                 self.graph[node['id']]['to'].append(target)
                 self.graph[target]['from'].append(node['id'])
-        print
+        print()
 
         self.node1_iter = iter(self.graph)
 
         cur_time = time()
-        print 'process took {0} sec'.format(cur_time - begin_time)
-        print
+        print('process took {0} sec'.format(cur_time - begin_time))
+        print()
 
     def _create_node(self, id):
         self.graph[id] = {'stat': self._create_stat_structure(), 'to': [], 'from': []}
@@ -65,7 +65,7 @@ class Graph:
         nodes = {node}
         seen = set([])
         neighbours = {node}
-        for i in xrange(dist):
+        for i in range(dist):
             # j = 0
             for node in nodes:
                 # j += 1
@@ -91,13 +91,13 @@ class Graph:
         stat[7]  = {'val': 0, 'desc': '(a<->b)(c->a)'}
         stat[8]  = {'val': 0, 'desc': '(a<->b)(c->a)(c->b)'}
         stat[9]  = {'val': 0, 'desc': '(a<->b)(a->c)(b->c)'}
-        stat[10]  = {'val': 0, 'desc': '(a<->b)(b->c)(c->a)'}
+        stat[10] = {'val': 0, 'desc': '(a<->b)(b->c)(c->a)'}
         stat[11] = {'val': 0, 'desc': '(a<->b)(a<->c)'}
         stat[12] = {'val': 0, 'desc': '(a<->b)(a<->c)(b->c)'}
         stat[13] = {'val': 0, 'desc': '(a<->b)(a<->c)(b<->c)'}
 
-        # for type in stat:
-        #     stat[type]['lock'] = threading.Lock()
+        for type in stat:
+            stat[type]['lock'] = threading.Lock()
 
         return stat
 
@@ -222,7 +222,7 @@ class Graph:
 
     def _next_node1(self):
         try:
-            return self.node1_iter.next()
+            return next(self.node1_iter)
         except StopIteration:
             return None
 
@@ -232,8 +232,7 @@ class Graph:
 
         :param dist: radius of neighbourhood
         """
-        print 'Compute 3-graphlets occurance.' \
-              ''
+        print('Compute 3-graphlets occurance.')
         begin_time = time()
 
         i = 0
@@ -241,7 +240,7 @@ class Graph:
         while node1 is not None:
             i += 1
             seen = set([])
-            print '\r    node {0}/{1}  [{2}%]'.format(i, len(self.graph), i * 100 / len(self.graph)),
+            print('\r    node {0}/{1}  [{2}%]'.format(i, len(self.graph), i * 100 // len(self.graph)), end=' ')
             nodes2 = self._undir(self.graph, node1)
             for node2 in nodes2:
                 # hold edge (node1,node2)
@@ -252,33 +251,33 @@ class Graph:
                     self._recognize_graphlet((node1, node2, node3), stats)
                 seen.add(node2)
             node1 = self._next_node1()
-        print
+        print()
         cur_time = time()
-        print '    process took {0} sec'.format(cur_time - begin_time)
-        print
+        print('    process took {0} sec'.format(cur_time - begin_time))
+        print()
 
     def save_result(self, outfile):
-        print 'Save result to the file.'
+        print('Save result to the file.')
         begin_time = time()
 
         graph_elems = []
         i = 0
         for node in self.graph:
             i += 1
-            print '\r    line {0}/{1}  [{2}%]'.format(i, len(self.graph), i * 100 / len(self.graph)),
+            print('\r    line {0}/{1}  [{2}%]'.format(i, len(self.graph), i * 100 // len(self.graph)), end=' ')
 
             for type in self.graph[node]['stat']:
-                self.graph[node]['stat'][type]['val'] /= 3
-                # del self.graph[node]['stat'][type]['lock']
+                self.graph[node]['stat'][type]['val'] //= 3
+                del self.graph[node]['stat'][type]['lock']
 
             graph_elems.append({'id': node, 'stat': self.graph[node]['stat']})
-        print
+        print()
 
-        print 'convert list to strings'
-        graph_elems = map(lambda x: json.dumps(x) + '\n', graph_elems)
+        print('convert list to strings')
+        graph_elems = [json.dumps(x) + '\n' for x in graph_elems]
 
         # print strings into output file
-        print 'Print sample into file'
+        print('Print sample into file')
         with open(outfile, 'wt') as output:
             output.writelines(graph_elems)
 
@@ -291,16 +290,16 @@ class MyThread(threading.Thread):
         self.graph = graph
 
     def run(self):
-        print 'thread {0} started'.format(self.id)
+        print('thread {0} started'.format(self.id))
         self.graph.eval_stat(self.dist)
-        print 'thread {0} finished'.format(self.id)
+        print('thread {0} finished'.format(self.id))
 
 
 def main(infile, outfile, dist, thread_num):
     sample = Graph(infile)
 
     threads = []
-    for i in xrange(thread_num):
+    for i in range(thread_num):
         threads.append(MyThread(i + 1, dist, sample))
 
     for thread in threads:
@@ -310,7 +309,7 @@ def main(infile, outfile, dist, thread_num):
         thread.join()
 
     sample.save_result(outfile)
-    print 'main thread finished'
+    print('main thread finished')
 
     return 0
 
