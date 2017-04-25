@@ -10,7 +10,7 @@ Estimators:
 	-alpha
 
 
-Current efficiency (5-fold CV, f1-score):
+Current efficiency at age determination(5-fold CV, f1-score):
 
 Without transforming:
 SGDClassifier:
@@ -27,5 +27,30 @@ SVC with RBF cernel:
 	0.62920569  0.63934981  0.62543433  0.62478062  0.63496408
 SVC with linear kernel:
 	0.6126636   0.61732725  0.61039886  0.58836944  0.60956618
+
+
+current efficiency at acount status determination(1-fold):
+
+First training samples (~250 '1' vs ~25000 '0'):
+With transforming:
+SGDClassifier:
+    prec: 0.2159    rec: 0.3363    f1: 0.2630
+GradientBoostClassifier:
+    prec: 0.3889    rec: 0.0619    f1: 0.1069
+RandomForestClassifier with unbalanced training samples:
+	prec: 0.3953    rec: 0.1504    f1: 0.2179
+RandomForestClassifier with balanced training samples:
+	prec: 0.1294    rec: 0.4513    f1: 0.2012
+
+Without transforming: complete
+SGDClassifier:
+	prec: 1.0000    rec: 0.0085    f1: 0.0168
+GradientBoostClassifier:
+	prec: 0.4211    rec: 0.0678    f1: 0.1168
+RandomForestClassifier with unbalanced training samples:
+	prec: 0.3438    rec: 0.0932    f1: 0.1467
+RandomForestClassifier with balanced training samples:
+	prec: 0.1161    rec: 0.4576    f1: 0.1852
+
 
 
